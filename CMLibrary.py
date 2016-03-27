@@ -155,14 +155,7 @@ def process_all_articles(glob_string, processing_function, **kwargs):
 def get_all_text(el):
     return "".join(el.itertext()).strip()
 
-def get_all_uses_of_citation(fname_or_etree, doi="10.3390/rs6043263"):
-    #print("Looking for %s in %s" % (doi, fname_or_etree))
-    if type(fname_or_etree) is not lxml.etree._ElementTree:
-        html = parse_html(fname_or_etree)
-    else:
-        html = fname_or_etree
-
-
+def get_doi_element(html, doi):
     sel = CSSSelector('.pub-id')
     res = sel(html)
 
@@ -172,9 +165,34 @@ def get_all_uses_of_citation(fname_or_etree, doi="10.3390/rs6043263"):
 
     assert len(matches) == 1
 
-    doi_element = matches[0]
+    return matches[0]
 
-    div = doi_element.getparent()
+def get_title_element(html, title):
+    sel = CSSSelector('.article-title')
+
+    res = sel(html)
+
+    matches = [r for r in res if all_whitespace_to_space(r.text_content) == title]
+    if len(matches) == 0:
+        return
+
+    assert len(matches) == 1
+
+    return matches[0]
+
+def get_all_uses_of_citation(fname_or_etree, doi="10.3390/rs6043263", title=""):
+    #print("Looking for %s in %s" % (doi, fname_or_etree))
+    if type(fname_or_etree) is not lxml.etree._ElementTree:
+        html = parse_html(fname_or_etree)
+    else:
+        html = fname_or_etree
+
+    if doi != "":
+        doi_element = get_doi_element(html, doi)
+        div = doi_element.getparent()
+    elif title != "":
+        title_element = get_title_element(html, title)
+        div = title_element.getparent()
     #print(all_whitespace_to_space(div.text_content()))
 
     li = div.getparent()
