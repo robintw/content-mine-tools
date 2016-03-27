@@ -5,6 +5,15 @@ import json
 import re
 from pathlib import Path
 
+import lxml
+from lxml.html import parse as parse_html
+from lxml.cssselect import CSSSelector
+import bisect
+
+import re
+
+def all_whitespace_to_space(s):
+    return re.sub(r'\s+', " ", s, flags=re.MULTILINE).strip()
 
 def get_article_metadata(folder_path):
     """
@@ -77,7 +86,7 @@ def process_article(folder, processing_function, **kwargs):
     regex, and returns a dict of article metadata & statistics results.
     """
     # If not a valid CM folder then return
-    if not (folder / 'results.json').exists() or not (folder / 'fulltext.xml').exists():
+    if not (folder / 'results.json').exists() or not (folder / 'fulltext.xml').exists() or not (folder / 'scholarly.html').exists():
         return None
 
     # Get the metadata first
@@ -111,6 +120,22 @@ def pf_count_regex(folder, **kwargs):
 
     return regex_stats
 
+def pf_get_citation(folder, doi=None):
+    d = {}
+
+    res = get_all_uses_of_citation(str(folder / 'scholarly.html'), doi=doi)
+
+
+
+    #print(res)
+    if res is not None:
+        for i, match in enumerate(res):
+            d["match_%d" % i] = match
+
+        return d
+    else:
+        return {}
+
 
 def process_all_articles(glob_string, processing_function, **kwargs):
     # example glob string = 'mdpi-rs/**/**'
@@ -125,3 +150,70 @@ def process_all_articles(glob_string, processing_function, **kwargs):
     results['date'] = pd.to_datetime(results.date)
 
     return results
+
+
+def get_all_text(el):
+    return "".join(el.itertext()).strip()
+
+def get_all_uses_of_citation(fname_or_etree, doi="10.3390/rs6043263"):
+    #print("Looking for %s in %s" % (doi, fname_or_etree))
+    if type(fname_or_etree) is not lxml.etree._ElementTree:
+        html = parse_html(fname_or_etree)
+    else:
+        html = fname_or_etree
+
+
+    sel = CSSSelector('.pub-id')
+    res = sel(html)
+
+    matches = [r for r in res if r.text_content().strip() == doi]
+    if len(matches) == 0:
+        return
+
+    assert len(matches) == 1
+
+    doi_element = matches[0]
+
+    div = doi_element.getparent()
+    #print(all_whitespace_to_space(div.text_content()))
+
+    li = div.getparent()
+    ref_id = li.find('a').attrib['name']
+
+    #print(ref_id)
+
+    sel = CSSSelector('a[href="#%s"]' % ref_id)
+    res = sel(html)
+    #print(res)
+    text = [get_sentence(r) for r in res]
+
+    return text
+
+def get_sentence(el):
+    """Given an <a> element from a HTML document, get a string of the full sentence it is in"""
+    el.text = '**REF**'
+    #print(el.text)
+    p = el.getparent()
+    text = p.text_content()
+    text = all_whitespace_to_space(text)
+
+    #print(text)
+
+    ref_loc = text.find('**REF**')
+
+    #print(ref_loc)
+
+    ends_of_sentences_pos = [m.end() for m in list(re.finditer(r'(?<!et al)\. ', text))]
+
+    #print(ends_of_sentences_pos)
+    ind = bisect.bisect(ends_of_sentences_pos, ref_loc)
+    #print("IND = %d" % ind)
+    #print(ends_of_sentences_pos)
+    #print(ref_loc)
+
+    if ind == len(ends_of_sentences_pos):
+        return text[ends_of_sentences_pos[ind-1]:].strip()
+    elif ind == 0:
+        return text[:ends_of_sentences_pos[ind]].strip()
+    else:
+        return text[ends_of_sentences_pos[ind-1]:ends_of_sentences_pos[ind]].strip()
