@@ -187,9 +187,16 @@ def get_all_uses_of_citation(fname_or_etree, doi="10.3390/rs6043263", title=""):
 
     if doi != "":
         doi_element = get_doi_element(html, doi)
+        if doi_element is None:
+            return
+
         div = doi_element.getparent()
     elif title != "":
         title_element = get_title_element(html, title)
+
+        if title_element is None:
+            return
+
         div = title_element.getparent()
     #print(all_whitespace_to_space(div.text_content()))
 
