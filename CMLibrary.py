@@ -123,9 +123,7 @@ def pf_count_regex(folder, **kwargs):
 def pf_get_citation(folder, doi="", title=""):
     d = {}
 
-    res = get_all_uses_of_citation(str(folder / 'scholarly.html'), doi=doi)
-
-
+    res = get_all_uses_of_citation(str(folder / 'scholarly.html'), doi=doi, title=title)
 
     #print(res)
     if res is not None:
