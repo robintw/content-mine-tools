@@ -120,7 +120,7 @@ def pf_count_regex(folder, **kwargs):
 
     return regex_stats
 
-def pf_get_citation(folder, doi=None):
+def pf_get_citation(folder, doi="", title=""):
     d = {}
 
     res = get_all_uses_of_citation(str(folder / 'scholarly.html'), doi=doi)
