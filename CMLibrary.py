@@ -170,7 +170,7 @@ def get_title_element(html, title):
 
     res = sel(html)
 
-    matches = [r for r in res if all_whitespace_to_space(r.text_content()).lower() == title.lower()]
+    matches = [r for r in res if title.lower() in all_whitespace_to_space(r.text_content()).lower()]
     if len(matches) == 0:
         return
 
