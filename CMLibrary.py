@@ -178,7 +178,7 @@ def get_title_element(html, title):
 
     return matches[0]
 
-def get_all_uses_of_citation(fname_or_etree, doi="10.3390/rs6043263", title=""):
+def get_all_uses_of_citation(fname_or_etree, doi="", title=""):
     #print("Looking for %s in %s" % (doi, fname_or_etree))
     if type(fname_or_etree) is not lxml.etree._ElementTree:
         html = parse_html(fname_or_etree)
@@ -198,6 +198,7 @@ def get_all_uses_of_citation(fname_or_etree, doi="10.3390/rs6043263", title=""):
             return
 
         div = title_element.getparent()
+
     #print(all_whitespace_to_space(div.text_content()))
 
     li = div.getparent()
@@ -209,6 +210,13 @@ def get_all_uses_of_citation(fname_or_etree, doi="10.3390/rs6043263", title=""):
     res = sel(html)
     #print(res)
     text = [get_sentence(r) for r in res]
+
+    if len(text) == 0:
+        # It is the in the list of references, but we can't find the citation
+        # This is probably because it was something like reference number 4
+        # and was cited as [2-5]
+        # So we return some text that explains the error
+        text = ['ERROR: In reference list, but cannot find citation. Check manually.']
 
     return text
 
