@@ -2,7 +2,7 @@
   "url": "tandfonline\\.com",
   "elements": {
     "publisher": {
-      "selector": "//meta[@name='dc.Publisher']",
+      "selector": "//meta[@property='og:site_name']",
       "attribute": "content"
     },
     "journal": {
