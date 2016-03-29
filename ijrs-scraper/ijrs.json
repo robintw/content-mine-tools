@@ -1,0 +1,75 @@
+{
+  "url": "tandfonline\\.com",
+  "elements": {
+    "publisher": {
+      "selector": "//meta[@name='dc.Publisher']",
+      "attribute": "content"
+    },
+    "journal": {
+      "selector": "//meta[@name='citation_journal_title']",
+      "attribute": "content"
+    },
+    "title": {
+      "selector": "//meta[@name='dc.Title']",
+      "attribute": "content"
+    },
+    "authors": {
+      "selector": "//meta[@name='dc.Creator']",
+      "attribute": "content"
+    },
+    "date": {
+      "selector": "//h3[a]",
+      "attribute": "text",
+      "regex": {
+          "source": "(\\d{4})"
+      }
+    },
+    "doi": {
+      "selector": "//meta[@name='dc.Identifier' and @scheme='doi']",
+      "attribute": "content"
+    },
+    "volume": {
+      "selector": "//h3/a[contains(@href,'vol')]",
+      "attribute": "text",
+      "regex": {
+          "source": "(\\d+)"
+      }
+    },
+    "issue": {
+      "selector": "//h3/a[contains(@href,'toc')]",
+      "attribute": "text",
+      "regex": {
+          "source": "(\\d+)"
+      }
+    },
+    "firstpage": {
+      "selector": "//div[@class='pageRange']",
+      "attribute": "text",
+      "regex": {
+          "source": "(\\d+)-"
+      }
+    },
+    "description": {
+        "selector": "//div[contains(@class, 'bd')]//div[contains(@class, 'paragraph')]",
+        "attribute": "text"
+    },
+    "abstract": {
+        "selector": "//div[contains(@class, 'bd')]//div[contains(@class, 'paragraph')]",
+        "attribute": "text"
+    },
+    "fulltext_html": {
+      "selector": "//ul[contains(@class, 'top_article_links')]//a[@class='txt']",
+      "attribute": "href",
+      "download": {
+        "rename": "fulltext.html"
+      }
+    },
+    "fulltext_pdf": {
+      "selector": "//ul[contains(@class, 'top_article_links')]//a[contains(@class, 'pdf')]",
+      "attribute": "href",
+      "download": {
+        "rename": "fulltext.pdf"
+      }
+    }
+  }
+}
