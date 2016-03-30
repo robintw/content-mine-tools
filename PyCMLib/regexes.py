@@ -51,7 +51,7 @@ def pf_count_regex(folder, filename="scholarly.html", **kwargs):
     return regex_stats
 
 
-def pf_count_regex_get_matches(folder, filename="scholarly.html", **kwargs):
+def pf_count_regex_by_match(folder, filename="scholarly.html", group=False, **kwargs):
     regexes = kwargs['regexes']
     flags = kwargs.get('flags', 0)
 
@@ -70,9 +70,13 @@ def pf_count_regex_get_matches(folder, filename="scholarly.html", **kwargs):
                 regex, name = item
             except (TypeError, ValueError):
                 regex = item
-                name = item
 
-            for m in re.findall(regex, text, flags=flags):
-                res[m.upper()] = res.get(m.upper(), 0) + 1
+            if not group:
+                for m in re.findall(regex, text, flags=flags):
+                    res[m.upper()] = res.get(m.upper(), 0) + 1
+            else:
+                for m in re.finditer(regex, text, flags=flags):
+                    group_match = m.groups()[0].upper()
+                    res[group_match] = res.get(group_match, 0) + 1
 
     return res
