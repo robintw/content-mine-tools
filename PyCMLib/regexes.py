@@ -44,7 +44,7 @@ def count_multiple_regexes(regexes, fname, flags=0):
 
 def pf_count_regex(folder, filename="scholarly.html", **kwargs):
     regexes = kwargs['regexes']
-    flags = kwargs['flags']
+    flags = kwargs.get('flags', 0)
 
     regex_stats = count_multiple_regexes(regexes, str(folder / filename), flags=flags)
 
