@@ -49,3 +49,30 @@ def pf_count_regex(folder, filename="scholarly.html", **kwargs):
     regex_stats = count_multiple_regexes(regexes, str(folder / filename), flags=flags)
 
     return regex_stats
+
+
+def pf_count_regex_get_matches(folder, filename="scholarly.html", **kwargs):
+    regexes = kwargs['regexes']
+    flags = kwargs.get('flags', 0)
+
+    fname = str(folder / filename)
+    res = {}
+
+    with open(fname) as f:
+        text = f.read()
+        #print(text)
+
+        if 'scholarly.html' in fname:
+            text, sep, ref_list = text.partition('<div tag="ref-list">')
+
+        for item in regexes:
+            try:
+                regex, name = item
+            except (TypeError, ValueError):
+                regex = item
+                name = item
+
+            for m in re.findall(regex, text, flags=flags):
+                res[m.upper()] = res.get(m.upper(), 0) + 1
+
+    return res
