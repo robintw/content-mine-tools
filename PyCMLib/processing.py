@@ -33,7 +33,7 @@ def process_article(folder, processing_function, **kwargs):
     regex, and returns a dict of article metadata & statistics results.
     """
     # If not a valid CM folder then return
-    if not (folder / 'results.json').exists() or not (folder / 'fulltext.xml').exists() or not (folder / 'scholarly.html').exists():
+    if not (folder / 'results.json').exists() or not (folder / 'scholarly.html').exists():
         return None
 
     # Get the metadata first
