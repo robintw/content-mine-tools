@@ -2,11 +2,14 @@ import lxml
 from lxml.html import parse as parse_html
 from lxml.cssselect import CSSSelector
 import bisect
+import re
 
-def pf_get_citation(folder, doi="", title=""):
+from .utils import all_whitespace_to_space
+
+def pf_get_citation(folder, doi="", title="", n_sentences=0):
     d = {}
 
-    res = get_all_uses_of_citation(str(folder / 'scholarly.html'), doi=doi, title=title)
+    res = get_all_uses_of_citation(str(folder / 'scholarly.html'), doi=doi, title=title, n_sentences=n_sentences)
 
     #print(res)
     if res is not None:
@@ -109,8 +112,15 @@ def get_sentence(el, n_around=0):
     #print(ends_of_sentences_pos)
     #print(ref_loc)
 
+    #print("ind: %d" % ind)
+    #print("n_around: %d" % n_around)
+    #print("len list: %d" % len(ends_of_sentences_pos))
     start_ind = ind - n_around
     stop_ind = ind + n_around
+    
+    #print("Start: %d" % start_ind)
+    #print("Stop: %d" % stop_ind)
+    #print('-----------')
 
     if start_ind < 0:
         start_ind = 0
@@ -122,7 +132,15 @@ def get_sentence(el, n_around=0):
     elif stop_ind >= len(ends_of_sentences_pos):
         stop_ind = len(ends_of_sentences_pos) - 1
 
-    return text[ends_of_sentences_pos[start_ind]:ends_of_sentences_pos[stop_ind]].strip()
+    #print("Start: %d" % start_ind)
+    #print("Stop: %d" % stop_ind)
+    #print('-----------')
+    
+    
+    t = text[ends_of_sentences_pos[start_ind]:ends_of_sentences_pos[stop_ind]] 
+    #print(t)
+    
+    return t.strip()
 
     # if ind == len(ends_of_sentences_pos):
     #     return text[ends_of_sentences_pos[ind-1]:].strip()
