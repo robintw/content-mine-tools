@@ -115,31 +115,44 @@ def get_sentence(el, n_around=0):
     #print("ind: %d" % ind)
     #print("n_around: %d" % n_around)
     #print("len list: %d" % len(ends_of_sentences_pos))
-    start_ind = ind - n_around
-    stop_ind = ind + n_around
-    
-    #print("Start: %d" % start_ind)
-    #print("Stop: %d" % stop_ind)
-    #print('-----------')
-
-    if start_ind < 0:
-        start_ind = 0
-    elif start_ind >= len(ends_of_sentences_pos):
-        start_ind = len(ends_of_sentences_pos) - 1
-
-    if stop_ind < 0:
-        stop_ind = 0
-    elif stop_ind >= len(ends_of_sentences_pos):
-        stop_ind = len(ends_of_sentences_pos) - 1
+    # start_ind = ind - n_around
+    # stop_ind = ind + n_around
 
     #print("Start: %d" % start_ind)
     #print("Stop: %d" % stop_ind)
     #print('-----------')
-    
-    
-    t = text[ends_of_sentences_pos[start_ind]:ends_of_sentences_pos[stop_ind]] 
-    #print(t)
-    
+
+    # if start_ind < 0:
+    #     start_ind = 0
+    # elif start_ind >= len(ends_of_sentences_pos):
+    #     start_ind = len(ends_of_sentences_pos) - 1
+    #
+    # if stop_ind < 0:
+    #     stop_ind = 0
+    # elif stop_ind >= len(ends_of_sentences_pos):
+    #     stop_ind = len(ends_of_sentences_pos) - 1
+    #
+    # #print("Start: %d" % start_ind)
+    #print("Stop: %d" % stop_ind)
+    #print('-----------')
+
+    if ind == len(ends_of_sentences_pos):
+        # The bisect function put ours AFTER the end of the list
+        # So we can't do any sentences after, we just do them before
+        chosen_ind = ind - n_around
+        chosen_ind = chosen_ind if chosen_ind > 0 else 0
+        sl = slice(ends_of_sentences_pos[ind - n_around], None)
+    elif ind <= 0:
+        # The bisect function put ours at the BEGINNING of the list
+        # So we can't do any BEFORE this one
+        chosen_ind = ind + n_around
+        chosen_ind = chosen_ind if chosen_ind < len(ends_of_sentences_pos) else len(ends_of_sentences_pos) - 1
+        sl = slice(None, ends_of_sentences_pos[ind + n_around])
+    else:
+        sl = slice(ends_of_sentences_pos[ind - (n_around + 1)], ends_of_sentences_pos[ind + n_around])
+
+    t = text[sl]
+
     return t.strip()
 
     # if ind == len(ends_of_sentences_pos):
