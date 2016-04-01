@@ -141,15 +141,21 @@ def get_sentence(el, n_around=0):
         # So we can't do any sentences after, we just do them before
         chosen_ind = ind - n_around
         chosen_ind = chosen_ind if chosen_ind > 0 else 0
-        sl = slice(ends_of_sentences_pos[ind - n_around], None)
+        sl = slice(ends_of_sentences_pos[chosen_ind], None)
     elif ind <= 0:
         # The bisect function put ours at the BEGINNING of the list
         # So we can't do any BEFORE this one
         chosen_ind = ind + n_around
         chosen_ind = chosen_ind if chosen_ind < len(ends_of_sentences_pos) else len(ends_of_sentences_pos) - 1
-        sl = slice(None, ends_of_sentences_pos[ind + n_around])
+        sl = slice(None, ends_of_sentences_pos[chosen_ind])
     else:
-        sl = slice(ends_of_sentences_pos[ind - (n_around + 1)], ends_of_sentences_pos[ind + n_around])
+        start_ind = ind - (n_around + 1)
+        start_ind = start_ind if start_ind > 0 else 0
+        
+        end_ind = ind + n_around
+        end_ind = end_ind if end_ind < len(ends_of_sentences_pos) else len(ends_of_sentences_pos) - 1
+        
+        sl = slice(ends_of_sentences_pos[start_ind], ends_of_sentences_pos[end_ind])
 
     t = text[sl]
 
