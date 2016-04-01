@@ -45,7 +45,7 @@ def get_title_element(html, title):
 
     return matches[0]
 
-def get_all_uses_of_citation(fname_or_etree, doi="", title=""):
+def get_all_uses_of_citation(fname_or_etree, doi="", title="", n_sentences=0):
     #print("Looking for %s in %s" % (doi, fname_or_etree))
     if type(fname_or_etree) is not lxml.etree._ElementTree:
         html = parse_html(fname_or_etree)
@@ -76,7 +76,7 @@ def get_all_uses_of_citation(fname_or_etree, doi="", title=""):
     sel = CSSSelector('a[href="#%s"]' % ref_id)
     res = sel(html)
     #print(res)
-    text = [get_sentence(r) for r in res]
+    text = [get_sentence(r, n_around=n_sentences) for r in res]
 
     if len(text) == 0:
         # It is the in the list of references, but we can't find the citation
@@ -87,7 +87,7 @@ def get_all_uses_of_citation(fname_or_etree, doi="", title=""):
 
     return text
 
-def get_sentence(el):
+def get_sentence(el, n_around=0):
     """Given an <a> element from a HTML document, get a string of the full sentence it is in"""
     el.text = '**REF**'
     #print(el.text)
@@ -109,9 +109,24 @@ def get_sentence(el):
     #print(ends_of_sentences_pos)
     #print(ref_loc)
 
-    if ind == len(ends_of_sentences_pos):
-        return text[ends_of_sentences_pos[ind-1]:].strip()
-    elif ind == 0:
-        return text[:ends_of_sentences_pos[ind]].strip()
-    else:
-        return text[ends_of_sentences_pos[ind-1]:ends_of_sentences_pos[ind]].strip()
+    start_ind = ind - n_around
+    stop_ind = ind + n_around
+
+    if start_ind < 0:
+        start_ind = 0
+    elif start_ind >= len(ends_of_sentences_pos):
+        start_ind = len(ends_of_sentences_pos) - 1
+
+    if stop_ind < 0:
+        stop_ind = 0
+    elif stop_ind >= len(ends_of_sentences_pos):
+        stop_ind = len(ends_of_sentences_pos) - 1
+
+    return text[ends_of_sentences_pos[start_ind]:ends_of_sentences_pos[stop_ind]].strip()
+
+    # if ind == len(ends_of_sentences_pos):
+    #     return text[ends_of_sentences_pos[ind-1]:].strip()
+    # elif ind <= n_around:
+    #     return text[:ends_of_sentences_pos[ind]].strip()
+    # else:
+    #     return text[ends_of_sentences_pos[ind-1]:ends_of_sentences_pos[ind]].strip()
