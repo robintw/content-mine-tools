@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import requests
 import logging
 
@@ -202,7 +203,7 @@ def main():
                              'Defaults to ERROR',
                         action='store')
 
-    for i in valid_filters:
+    for i in sorted(valid_filters):
         parser.add_argument('--%s' % i,
                             help='Search by %s' % i,
                             action='store')
