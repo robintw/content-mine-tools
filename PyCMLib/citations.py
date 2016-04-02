@@ -55,20 +55,25 @@ def get_all_uses_of_citation(fname_or_etree, doi="", title="", n_sentences=0):
     else:
         html = fname_or_etree
 
+    # Try searching by div first
     if doi != "":
         doi_element = get_doi_element(html, doi)
         if doi_element is None:
-            return
+            div = None
+        else:
+            div = doi_element.getparent()
 
-        div = doi_element.getparent()
-    elif title != "":
+    # But we couldn't find the DOI then try the title
+    if div is None and title != "":
         title_element = get_title_element(html, title)
 
         if title_element is None:
-            return
+            div = None
+        else:
+            div = title_element.getparent()
 
-        div = title_element.getparent()
-
+    if div is None:
+        return
     #print(all_whitespace_to_space(div.text_content()))
 
     li = div.getparent()
@@ -151,10 +156,10 @@ def get_sentence(el, n_around=0):
     else:
         start_ind = ind - (n_around + 1)
         start_ind = start_ind if start_ind > 0 else 0
-        
+
         end_ind = ind + n_around
         end_ind = end_ind if end_ind < len(ends_of_sentences_pos) else len(ends_of_sentences_pos) - 1
-        
+
         sl = slice(ends_of_sentences_pos[start_ind], ends_of_sentences_pos[end_ind])
 
     t = text[sl]
