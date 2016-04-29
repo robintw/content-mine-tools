@@ -2,6 +2,8 @@ import pandas as pd
 import json
 from pathlib import Path
 
+from .metadata import get_metadata_from_schol_html
+
 
 def get_article_metadata(folder_path):
     """
@@ -32,9 +34,13 @@ def process_article(folder, processing_function, **kwargs):
     Then runs a given processing method (here it counts matches against multiple
     regex, and returns a dict of article metadata & statistics results.
     """
-    # If not a valid CM folder then return
-    if not (folder / 'results.json').exists() or not (folder / 'scholarly.html').exists():
-        return None
+    # If no scholarly.html then skip
+    if not (folder / 'scholarly.html').exists():
+        return
+
+    # If no results.json then create it from scholarly.html
+    if not (folder / 'results.json').exists():
+        get_metadata_from_schol_html(folder)
 
     # Get the metadata first
     results = get_article_metadata(folder)
