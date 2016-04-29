@@ -13,8 +13,8 @@ def get_metadata_from_schol_html(path):
 
     metadata['title'] = {'value': [all_whitespace_to_space(get_text_from_selector(doc, '.title-group')[0])]}
     metadata['doi'] = {'value': [all_whitespace_to_space(get_text_from_selector(doc, '.doi')[0]).replace('doi: ', '')]}
-    metadata['date'] = {'value': ['']}
-    metadata['journal'] = {'value': ['']}
+    metadata['date'] = {'value': [all_whitespace_to_space(get_text_from_selector(doc, '.pub-date-epub')[0]).replace('epub: ', '')]}
+    metadata['journal'] = {'value': [all_whitespace_to_space(get_text_from_selector(doc, '.journal-title')[0])]}
 
     with open(str(path / 'results.json'), 'w') as f:
         json.dump(metadata, f, indent=4)
