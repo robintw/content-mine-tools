@@ -2,6 +2,8 @@ import pandas as pd
 import json
 from pathlib import Path
 
+import tqdm
+
 from .metadata import get_metadata_from_schol_html
 
 
@@ -57,7 +59,7 @@ def process_all_articles(glob_string, processing_function, **kwargs):
     p = Path()
     folders = p.glob(glob_string)
 
-    results = [process_article(folder, processing_function, **kwargs) for folder in folders]
+    results = [process_article(folder, processing_function, **kwargs) for folder in tqdm(folders)]
 
     # Filter out the None's...there must be a better way to do this!
     results = filter(None, results)
