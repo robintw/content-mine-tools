@@ -1,11 +1,14 @@
 import pandas as pd
-import json
+import ujson as json
 from pathlib import Path
 
-import tqdm
+from tqdm import tqdm
 
 from .metadata import get_metadata_from_schol_html
 
+print(json.__file__)
+
+from joblib import Parallel, delayed
 
 def get_article_metadata(folder_path):
     """
@@ -59,8 +62,13 @@ def process_all_articles(glob_string, processing_function, **kwargs):
     p = Path()
     folders = p.glob(glob_string)
 
-    results = [process_article(folder, processing_function, **kwargs) for folder in tqdm(folders)]
+    #results = [process_article(folder, processing_function, **kwargs) for folder in tqdm(folders)]
 
+    results = Parallel(n_jobs=-1, verbose=2)(delayed(process_article)(folder, processing_function, **kwargs) for folder in folders)
+
+    # Parallel(n_jobs=2)(delayed(sqrt)(i ** 2) for i in range(10))
+    
+    
     # Filter out the None's...there must be a better way to do this!
     results = filter(None, results)
     results = pd.DataFrame(list(results))
