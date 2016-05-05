@@ -9,8 +9,11 @@ from .utils import all_whitespace_to_space
 def pf_get_citation(folder, doi="", title="", n_sentences=0):
     d = {}
 
-    res = get_all_uses_of_citation(str(folder / 'scholarly.html'), doi=doi, title=title, n_sentences=n_sentences)
-
+    try:
+        res = get_all_uses_of_citation(str(folder / 'scholarly.html'), doi=doi, title=title, n_sentences=n_sentences)
+    except Exception:
+        res = ['ERROR: Exception raised in get_all_uses_of_citation']
+        
     #print(res)
     if res is not None:
         for i, match in enumerate(res):
@@ -36,9 +39,11 @@ def get_doi_element(html, doi):
     return matches[0]
 
 def get_title_element(html, title):
-    sel = CSSSelector('.article-title')
+    #sel = CSSSelector('.mixed-article-title')
 
-    res = sel(html)
+    #res = sel(html)
+    
+    res = html.xpath("//*[contains(@class, 'article-title')]")
 
     matches = [r for r in res if title.lower() in all_whitespace_to_space(r.text_content()).lower()]
     if len(matches) == 0:
