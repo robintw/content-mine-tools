@@ -1,4 +1,4 @@
-import json
+import ujson as json
 
 from lxml.html import parse as parse_html
 from .utils import get_text_from_selector, all_whitespace_to_space
